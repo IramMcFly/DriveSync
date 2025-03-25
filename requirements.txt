@@ -1,0 +1,5 @@
+# Install dependencies
+npm i
+# Install framer-motion and react-icons
+npm i framer-motion
+npm i react-icons
