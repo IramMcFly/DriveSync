@@ -43,7 +43,7 @@ export default function Header() {
             `}
             >
               <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 p-4 md:p-0 md:ml-64">
-                <NavItem href="/servicios" active icon={<Zap size={16} />}>
+                <NavItem href="/view" active icon={<Zap size={16} />}>
                   Servicios Express
                 </NavItem>
                 <NavItem href="/lugares" icon={<MapPin size={16} />}>
@@ -77,7 +77,7 @@ export default function Header() {
       {/* Barra de navegación inferior para móviles */}
       {isMobile && (
         <nav className="fixed bottom-0 left-0 right-0 bg-gradient-to-r from-[#5D2A0C] to-[#8B4513] text-white h-16 flex items-center justify-around z-50 shadow-[0_-2px_10px_rgba(0,0,0,0.1)]">
-          <MobileNavItem href="/servicios" icon={<Zap size={24} />}>
+          <MobileNavItem href="/view" icon={<Zap size={24} />}>
             Servicios Express
           </MobileNavItem>
           <MobileNavItem href="/lugares" icon={<MapPin size={24} />}>
