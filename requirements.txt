@@ -3,4 +3,7 @@ npm i
 # Install framer-motion and react-icons
 npm i framer-motion
 npm i react-icons
-npm install lucide-react #for the navbuttons and responsivity
+npm install lucide-react #for the navbuttons and 
+
+# Install Mongoose
+npm i mongoose
