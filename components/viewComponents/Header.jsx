@@ -3,10 +3,35 @@
 import Link from "next/link"
 import { useState, useEffect } from "react"
 import { Zap, MapPin, LifeBuoy, User, Menu, X } from "lucide-react"
+import React from "react"
+import { usePathname } from 'next/navigation'
+
+const navigationLinks = [
+  {
+    name: "Servicios Express",
+    href: "/view",
+    icon: <Zap size={16} />,
+    component: "ServiciosExpress",
+    active: true
+  },
+  {
+    name: "Lugares Afiliados",
+    href: "/lugares",
+    icon: <MapPin size={16} />,
+    component: "Lugares"
+  },
+  {
+    name: "Asistencia Especial",
+    href: "/asistencia",
+    icon: <LifeBuoy size={16} />,
+    component: "Asistencia"
+  }
+]
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
+  const pathname = usePathname()
 
   // Detectar si es dispositivo móvil
   useEffect(() => {
@@ -43,15 +68,16 @@ export default function Header() {
             `}
             >
               <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 p-4 md:p-0 md:ml-64">
-                <NavItem href="/view" active icon={<Zap size={16} />}>
-                  Servicios Express
-                </NavItem>
-                <NavItem href="/lugares" icon={<MapPin size={16} />}>
-                  Lugares Afiliados
-                </NavItem>
-                <NavItem href="/asistencia" icon={<LifeBuoy size={16} />}>
-                  Asistencia Especial
-                </NavItem>
+                {navigationLinks.map((link) => (
+                  <NavItem 
+                    key={link.href}
+                    href={link.href}
+                    active={pathname === link.href}
+                    icon={link.icon}
+                  >
+                    {link.name}
+                  </NavItem>
+                ))}
               </div>
             </nav>
 
@@ -77,15 +103,15 @@ export default function Header() {
       {/* Barra de navegación inferior para móviles */}
       {isMobile && (
         <nav className="fixed bottom-0 left-0 right-0 bg-gradient-to-r from-[#5D2A0C] to-[#8B4513] text-white h-16 flex items-center justify-around z-50 shadow-[0_-2px_10px_rgba(0,0,0,0.1)]">
-          <MobileNavItem href="/view" icon={<Zap size={24} />}>
-            Servicios Express
-          </MobileNavItem>
-          <MobileNavItem href="/lugares" icon={<MapPin size={24} />}>
-            Lugares Afiliados
-          </MobileNavItem>
-          <MobileNavItem href="/asistencia" icon={<LifeBuoy size={24} />}>
-            Asistencia Especial
-          </MobileNavItem>
+          {navigationLinks.map((link) => (
+            <MobileNavItem 
+              key={link.href}
+              href={link.href}
+              icon={React.cloneElement(link.icon, { size: 24 })}
+            >
+              {link.name}
+            </MobileNavItem>
+          ))}
         </nav>
       )}
     </>
