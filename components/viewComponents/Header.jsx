@@ -22,7 +22,7 @@ const navigationLinks = [
   },
   {
     name: "Asistencia Especial",
-    href: "/asistencia",
+    href: "/asistenciaOnline",
     icon: <LifeBuoy size={16} />,
     component: "Asistencia"
   }
