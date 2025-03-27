@@ -24,17 +24,24 @@ export default function LoginForm() {
 
     try {
       setIsLoading(true)
-      // Here you would implement your authentication logic
-      // For example:
-      // const response = await signIn('credentials', { email, password, redirect: false })
+      const response = await fetch('/api/users', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      })
 
-      // Simulating authentication for demo purposes
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      const data = await response.json()
 
-      // If successful, redirect to dashboard
-      router.push("/dashboard")
+      if (!response.ok) {
+        throw new Error(data.error || 'Error al procesar la solicitud')
+      }
+
+      // Si todo sale bien, redirigir a la vista view
+      router.push("/view")
     } catch (err) {
-      setError("Credenciales inválidas. Por favor, intente de nuevo.")
+      setError(err.message || "Error al procesar la solicitud. Por favor, intente de nuevo.")
     } finally {
       setIsLoading(false)
     }

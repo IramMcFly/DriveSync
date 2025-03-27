@@ -7,3 +7,9 @@ npm install lucide-react #for the navbuttons and
 
 # Install Mongoose
 npm i mongoose
+
+# Install Mongodb
+npm i mongodb
+
+# Install bcrypt for password hashing
+npm i bcrypt
