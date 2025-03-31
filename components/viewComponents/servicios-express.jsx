@@ -1,4 +1,5 @@
 import Image from "next/image"
+import Link from "next/link"
 
 export default function ServiciosExpress() {
   const servicios = [
@@ -98,9 +99,11 @@ export default function ServiciosExpress() {
                 <p className="text-orange-400 font-medium text-lg">
                   Desde: {servicio.price}
                 </p>
-                <button className="text-sm bg-orange-600 hover:bg-orange-700 text-white px-5 py-2 rounded-lg font-medium transition-all duration-300 hover:shadow-lg hover:shadow-orange-600/50">
-                  Solicitar
-                </button>
+                <Link href="/formServicios">
+                  <button className="text-sm bg-orange-600 hover:bg-orange-700 text-white px-5 py-2 rounded-lg font-medium transition-all duration-300 hover:shadow-lg hover:shadow-orange-600/50">
+                    Solicitar
+                  </button>
+                </Link>
               </div>
             </div>
           </div>
