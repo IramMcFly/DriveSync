@@ -1,7 +1,7 @@
 "use client"
 
 import { useSearchParams } from "next/navigation"
-import ServiceForm from "@/components/ServiceForm"
+import ServiceForm from "@/components/viewComponents/Service-Form"
 
 export default function FormServiciosClient() {
   const searchParams = useSearchParams()
@@ -13,3 +13,4 @@ export default function FormServiciosClient() {
     </main>
   )
 }
+    

@@ -1,9 +1,5 @@
-import dynamic from "next/dynamic"
 import Header from "@/components/viewComponents/Header"
-
-const FormServiciosClient = dynamic(() => import("@/components/FormServiciosClient"), {
-  ssr: false,
-})
+import FormServiciosClient from "@/components/viewComponents/FormServiciosClient"
 
 export default function FormServiciosPage() {
   return (
