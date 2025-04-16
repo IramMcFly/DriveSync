@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react"
 import AsistenteEnCamino from "@/components/viewComponents/AsistenteEnCamino"
 import Header from "@/components/viewComponents/Header"
+import "leaflet/dist/leaflet.css"
+
 
 function getRandomNearbyCoords([lat, lon], radiusKm = 2) {
   const radiusInDegrees = radiusKm / 111.32 // Aprox. conversión de km a grados
