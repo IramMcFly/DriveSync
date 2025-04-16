@@ -4,15 +4,12 @@ import { useState, useEffect } from "react"
 import { MapPin, ChevronDown } from "lucide-react"
 
 const ServiceForm = ({ serviceType }) => {
-  // Estado para los campos del formulario
   const [formData, setFormData] = useState({
     marca: "",
     modelo: "",
     año: "",
     metodoPago: "",
     tallerServicio: "",
-    tipoGasolina: "",
-    cantidadLitros: "",
     tipoVehiculo: "",
     servicioGrua: "",
     tipoServicio: "",
@@ -20,52 +17,43 @@ const ServiceForm = ({ serviceType }) => {
     useLocation: false,
   })
 
-  // Precios según el tipo de servicio
   const [price, setPrice] = useState(null)
 
-  // Precios de gasolina
-  const gasolinePrices = [
-    { type: "Verde", price: 23.5 },
-    { type: "Roja", price: 25.65 },
-    { type: "Diesel", price: 23.5 },
-  ]
-
-  // Opciones para los selectores
-  const marcas = ["Toyota", "Honda", "Ford", "Chevrolet", "Nissan", "Volkswagen"]
-  const metodosPago = ["Tarjeta de crédito", "Tarjeta de débito", "Efectivo", "Transferencia"]
+  const marcas = ["Toyota", "Honda", "Ford", "Chevrolet", "Nissan", "Volkswagen", "Otro"]
+  const metodosPago = ["Tarjeta", "Efectivo"] // ✅ Filtradas como pediste
   const talleres = ["Taller Mecánico AutoAvante", "Garage Orona", "Multiservicios Almeraz"]
-  const tiposGasolina = ["Verde", "Roja", "Diesel"]
   const tiposVehiculo = ["Sedán", "SUV", "Pickup", "Hatchback", "Minivan"]
   const serviciosGrua = ["Arrastre completo", "Cambio de llanta", "Carga de batería"]
   const tiposServicio = ["Básico", "Completo", "Premium"]
   const serviciosLimpieza = ["Lavado exterior", "Lavado completo", "Detallado"]
 
-  // Actualizar precio según el tipo de servicio y selecciones
+  const encabezados = {
+    asistencia: "Asistencia Vehicular",
+    grua: "Servicio de Grúa",
+    limpieza: "Limpieza del Vehículo",
+    diagnostico: "Diagnóstico del Vehículo",
+    cerrajeria: "Servicio de Cerrajería"
+  }
+
   useEffect(() => {
     if (serviceType === "asistencia") {
       setPrice(183.3)
-    } else if (serviceType === "combustible") {
-      const selectedGas = gasolinePrices.find((gas) => gas.type === formData.tipoGasolina)
-      const litros = Number.parseFloat(formData.cantidadLitros) || 0
-      if (selectedGas && litros > 0) {
-        setPrice(selectedGas.price * litros)
-      } else {
-        setPrice(null)
-      }
     } else if (serviceType === "grua") {
       setPrice(341.56)
     } else if (serviceType === "limpieza") {
-      // Precios base para limpieza
       const preciosLimpieza = {
         "Lavado exterior": 120,
         "Lavado completo": 250,
         Detallado: 450,
       }
       setPrice(preciosLimpieza[formData.servicioLimpieza] || null)
+    } else if (serviceType === "diagnostico") {
+      setPrice(120)
+    } else if (serviceType === "cerrajeria") {
+      setPrice(430)
     }
   }, [serviceType, formData])
 
-  // Manejar cambios en los campos
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target
     setFormData({
@@ -74,15 +62,12 @@ const ServiceForm = ({ serviceType }) => {
     })
   }
 
-  // Manejar envío del formulario
   const handleSubmit = (e) => {
     e.preventDefault()
     console.log("Formulario enviado:", formData)
-    // Aquí iría la lógica para enviar los datos al servidor
     alert("Servicio solicitado con éxito")
   }
 
-  // Renderizar selector
   const renderSelect = (name, label, options, required = false) => (
     <div className="mb-4">
       <div className="flex justify-between items-center mb-1">
@@ -109,7 +94,6 @@ const ServiceForm = ({ serviceType }) => {
     </div>
   )
 
-  // Renderizar input de texto
   const renderInput = (name, label, type = "text", required = false) => (
     <div className="mb-4">
       <div className="flex justify-between items-center mb-1">
@@ -127,7 +111,6 @@ const ServiceForm = ({ serviceType }) => {
     </div>
   )
 
-  // Renderizar toggle de ubicación
   const renderLocationToggle = () => (
     <div className="mb-4 flex items-center justify-between">
       <div className="flex items-center">
@@ -147,66 +130,110 @@ const ServiceForm = ({ serviceType }) => {
     </div>
   )
 
-  // Renderizar tabla de precios de gasolina
-  const renderGasolinePrices = () => (
-    <div className="mb-6">
-      <p className="text-white mb-4">El precio puede variar</p>
+  const tiposValidos = Object.keys(encabezados)
+  if (!tiposValidos.includes(serviceType)) {
+    return <p className="text-white text-center mt-10">Servicio no válido o no disponible</p>
+  }
 
-      <div className="mb-4">
-        <div className="flex justify-between mb-2">
-          <span className="text-gray-400 text-sm">TIPO DE GASOLINA</span>
-          <span className="text-gray-400 text-sm">PRECIO (LITRO)</span>
-        </div>
+  const isFormValid = () => {
+    if (serviceType === "asistencia") {
+      return (
+        formData.marca &&
+        formData.modelo &&
+        formData.año &&
+        formData.metodoPago
+      )
+    }
 
-        {gasolinePrices.map((gas, index) => (
-          <div key={index} className="flex justify-between py-2 border-b border-gray-700">
-            <span className="text-white">{gas.type}</span>
-            <span className="text-white">{gas.price.toFixed(2)}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
+    if (serviceType === "grua") {
+      return (
+        formData.tipoVehiculo &&
+        formData.metodoPago &&
+        formData.servicioGrua
+      )
+    }
+
+    if (serviceType === "limpieza") {
+      return (
+        formData.tipoVehiculo &&
+        formData.servicioLimpieza &&
+        formData.metodoPago
+      )
+    }
+
+    if (serviceType === "diagnostico") {
+      return formData.marca && formData.año
+    }    
+
+    if (serviceType === "cerrajeria") {
+      return (
+        formData.marca &&
+        formData.modelo &&
+        formData.año &&
+        formData.metodoPago
+      )
+    }
+
+    return false
+  }
 
   return (
     <div className="bg-[#1E1E1E] rounded-lg p-6 max-w-md mx-auto">
       <form onSubmit={handleSubmit}>
-        {/* Formulario para Asistencia Vehicular */}
+        {/* ✅ Encabezado dinámico según tipo */}
+        <h2 className="text-white text-xl font-bold mb-6">{encabezados[serviceType]}</h2>
+
+        {/* Formulario específico por tipo */}
         {serviceType === "asistencia" && (
           <>
-            <h2 className="text-white text-xl font-bold mb-6">Ingresa los Datos de tu Vehiculo</h2>
             {renderSelect("marca", "Marca", marcas, true)}
             {renderInput("modelo", "Modelo", "text", true)}
             {renderInput("año", "Año", "number", true)}
             {renderSelect("metodoPago", "Metodo de Pago", metodosPago, true)}
             {renderSelect("tallerServicio", "Taller del Servicio", talleres)}
-
             <div className="mb-4">
               <p className="text-white text-sm mb-1">Solicitar por:</p>
               <p className="text-white text-2xl font-bold">{price?.toFixed(2)}</p>
               <p className="text-gray-400 text-sm">MXN</p>
             </div>
-
             {renderLocationToggle()}
           </>
         )}
 
-        {/* Formulario para Carga de Combustible */}
-        {serviceType === "combustible" && (
+        {serviceType === "grua" && (
           <>
-            {renderGasolinePrices()}
-
-            {renderSelect("tipoGasolina", "Tipo de gasolina", tiposGasolina, true)}
-
-            {renderLocationToggle()}
-
-            {renderInput("cantidadLitros", "Cantidad (Litros)", "number", true)}
-
+            {renderSelect("tipoVehiculo", "Tipo de Vehiculo", tiposVehiculo, true)}
             {renderSelect("metodoPago", "Metodo de Pago", metodosPago, true)}
+            {renderSelect("servicioGrua", "Servicio de grua", serviciosGrua)}
+            <div className="mb-4">
+              <p className="text-white text-sm mb-1">Por este servicio pagas:</p>
+              <p className="text-white text-2xl font-bold">${price?.toFixed(2)}</p>
+            </div>
+          </>
+        )}
 
-            <p className="text-gray-400 text-sm mb-4">
-              La aplicación te comunicara el total cuando el asistente complete la carga de combustible.
-            </p>
+        {serviceType === "limpieza" && (
+          <>
+            {renderSelect("tipoVehiculo", "Tipo de Vehículo", tiposVehiculo, true)}
+
+            {renderSelect("servicioLimpieza", "Tipo de limpieza", serviciosLimpieza, true)}
+
+            {/* ✅ Descripción dinámica según la opción */}
+            {formData.servicioLimpieza && (
+              <div className="mb-4 text-sm text-gray-300 bg-[#2a2a2a] p-3 rounded-lg">
+                {formData.servicioLimpieza === "Lavado exterior" && (
+                  <p>Incluye lavado de carrocería, cristales y llantas. No se limpia el interior.</p>
+                )}
+                {formData.servicioLimpieza === "Lavado completo" && (
+                  <p>Incluye lavado exterior e interior (alfombras, tablero, puertas y asientos).</p>
+                )}
+                {formData.servicioLimpieza === "Detallado" && (
+                  <p>Limpieza profunda interior y exterior. Incluye encerado, abrillantado y restauración de plásticos.</p>
+                )}
+              </div>
+            )}
+
+            {renderSelect("metodoPago", "Método de Pago", metodosPago, true)}
 
             {price && (
               <div className="mb-4">
@@ -215,55 +242,47 @@ const ServiceForm = ({ serviceType }) => {
                 <p className="text-gray-400 text-sm">MXN</p>
               </div>
             )}
+
+            {renderLocationToggle()}
           </>
         )}
 
-        {/* Formulario para Servicio de Grúa */}
-        {serviceType === "grua" && (
+        {serviceType === "diagnostico" && (
           <>
-            {renderSelect("tipoVehiculo", "Tipo de Vehiculo", tiposVehiculo, true)}
-            {renderSelect("metodoPago", "Metodo de Pago", metodosPago, true)}
-            {renderSelect("servicioGrua", "Servicio de grua", serviciosGrua)}
-
-            <div className="mb-4">
-              <p className="text-white text-sm mb-1">Por este servicio pagas:</p>
-              <p className="text-white text-2xl font-bold">${price?.toFixed(2)}</p>
-            </div>
+            {renderSelect("marca", "Marca", marcas)}
+            {renderInput("año", "Año", "number")}
+            <p className="text-white mb-4">Precio estimado del diagnóstico:</p>
+            <p className="text-white text-2xl font-bold mb-2">${price?.toFixed(2)}</p>
+            {renderLocationToggle()}
           </>
         )}
 
-        {/* Formulario para Servicio de Limpieza */}
-        {serviceType === "limpieza" && (
+        {serviceType === "cerrajeria" && (
           <>
-            <h2 className="text-white text-xl font-bold mb-6">Detalles del Vehiculo</h2>
-
-            {renderSelect("tipoVehiculo", "Tipo de Vehiculo", tiposVehiculo)}
-            {renderSelect("tipoServicio", "Tipo de Servicio", tiposServicio, true)}
-            {renderSelect("metodoPago", "Metodo de Pago", metodosPago)}
-            {renderSelect("servicioLimpieza", "Servicio de Limpieza", serviciosLimpieza)}
-
-            <p className="text-white mb-4">Limpieza del Vehiculo</p>
-
-            {price && (
-              <div className="mb-4">
-                <p className="text-white text-sm mb-1">Total:</p>
-                <p className="text-white text-2xl font-bold">${price.toFixed(2)}</p>
-                <p className="text-gray-400 text-sm">MXN</p>
-              </div>
-            )}
+            {renderSelect("marca", "Marca", marcas)}
+            {renderInput("modelo", "Modelo")}
+            {renderInput("año", "Año", "number")}
+            {renderSelect("metodoPago", "Método de Pago", metodosPago)}
+            <p className="text-white mb-4">Precio estimado del servicio:</p>
+            <p className="text-white text-2xl font-bold mb-2">${price?.toFixed(2)}</p>
+            {renderLocationToggle()}
           </>
         )}
 
         <button
           type="submit"
-          className="bg-[#E85D04] hover:bg-[#F48C06] text-white py-2 px-4 rounded-md transition-colors w-auto"
+          disabled={!isFormValid()}
+          className={`py-2 px-4 rounded-md transition-colors w-auto font-semibold ${isFormValid()
+            ? "bg-[#E85D04] hover:bg-[#F48C06] text-white"
+            : "bg-gray-600 text-gray-300 cursor-not-allowed"
+            }`}
         >
           Enviar
         </button>
+
       </form>
     </div>
   )
 }
 
 export default ServiceForm
-

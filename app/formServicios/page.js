@@ -1,16 +1,21 @@
-import React from 'react'
+"use client"
 
-// Components
-import Header from '@/components/viewComponents/Header'
-import Tester from '@/components/viewComponents/Tester'
+import { useSearchParams } from "next/navigation"
+import Header from "@/components/viewComponents/Header"
+import ServiceForm from "@/components/viewComponents/Service-Form" // Ajusta si tu ruta es diferente
 
-const HomeView = () => {
+const FormServiciosPage = () => {
+  const searchParams = useSearchParams()
+  const tipo = searchParams.get("tipo")
+
   return (
     <>
-        <Header />
-        <Tester />
+      <Header />
+      <main className="min-h-screen bg-black p-6">
+        <ServiceForm serviceType={tipo} />
+      </main>
     </>
   )
 }
 
-export default HomeView
+export default FormServiciosPage
