@@ -194,7 +194,6 @@ const ServiceForm = ({ serviceType }) => {
               <p className="text-white text-2xl font-bold">{price?.toFixed(2)}</p>
               <p className="text-gray-400 text-sm">MXN</p>
             </div>
-            {renderLocationToggle()}
           </>
         )}
 
@@ -240,8 +239,6 @@ const ServiceForm = ({ serviceType }) => {
                 <p className="text-gray-400 text-sm">MXN</p>
               </div>
             )}
-
-            {renderLocationToggle()}
           </>
         )}
 
@@ -251,7 +248,6 @@ const ServiceForm = ({ serviceType }) => {
             {renderInput("año", "Año", "number")}
             <p className="text-white mb-4">Precio estimado del diagnóstico:</p>
             <p className="text-white text-2xl font-bold mb-2">${price?.toFixed(2)}</p>
-            {renderLocationToggle()}
           </>
         )}
 
@@ -263,7 +259,6 @@ const ServiceForm = ({ serviceType }) => {
             {renderSelect("metodoPago", "Método de Pago", metodosPago)}
             <p className="text-white mb-4">Precio estimado del servicio:</p>
             <p className="text-white text-2xl font-bold mb-2">${price?.toFixed(2)}</p>
-            {renderLocationToggle()}
           </>
         )}
 
