@@ -84,10 +84,10 @@ const Lugares = () => {
 
   const lugaresFiltered = searchTerm
     ? lugaresAfiliados.filter(
-        (lugar) =>
-          lugar.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          lugar.descripcion.toLowerCase().includes(searchTerm.toLowerCase())
-      )
+      (lugar) =>
+        lugar.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        lugar.descripcion.toLowerCase().includes(searchTerm.toLowerCase())
+    )
     : lugaresAfiliados
 
   return (
@@ -109,28 +109,32 @@ const Lugares = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 xl:gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
         {lugaresFiltered.map((lugar) => (
           <div
             key={lugar.id}
-            className="group relative bg-gradient-to-b from-gray-800 to-gray-900 border border-[#333] hover:border-orange-500 rounded-xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-orange-500/10"
+            className="bg-[#1E1E1E] border border-[#333] rounded-xl shadow-md hover:shadow-orange-500/30 transition-all duration-300 flex flex-col items-center text-center overflow-hidden"
           >
-            <div className="relative h-52 overflow-hidden">
+            <div className="w-full h-48 relative">
               <Image
                 src={lugar.imagen}
                 alt={lugar.nombre}
                 fill
-                className="object-cover transition-transform duration-300 group-hover:scale-110 opacity-60"
+                className="object-cover w-full h-full"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/60 to-transparent" />
             </div>
-            <div className="p-6 space-y-4">
-              <h3 className="text-2xl font-semibold text-white">{lugar.nombre}</h3>
-              <p className="text-orange-400">{lugar.descripcion}</p>
+            <div className="p-4 space-y-2 w-full">
+              <h3 className="text-white text-lg font-semibold">{lugar.nombre}</h3>
+              <p className="text-gray-300 text-sm">{lugar.descripcion}</p>
+              {/* Puedes agregar un botón si quieres algo como "Ver más" */}
+              {/* <button className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg text-sm transition duration-300">
+          Ver más
+        </button> */}
             </div>
           </div>
         ))}
       </div>
+
 
       {lugaresFiltered.length === 0 && (
         <div className="text-center py-10">
