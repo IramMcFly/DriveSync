@@ -1,21 +1,15 @@
-"use client"
-
-import { useSearchParams } from "next/navigation"
+import dynamic from "next/dynamic"
 import Header from "@/components/viewComponents/Header"
-import ServiceForm from "@/components/viewComponents/Service-Form" // Ajusta si tu ruta es diferente
 
-const FormServiciosPage = () => {
-  const searchParams = useSearchParams()
-  const tipo = searchParams.get("tipo")
+const FormServiciosClient = dynamic(() => import("@/components/FormServiciosClient"), {
+  ssr: false,
+})
 
+export default function FormServiciosPage() {
   return (
     <>
       <Header />
-      <main className="min-h-screen bg-black p-6">
-        <ServiceForm serviceType={tipo} />
-      </main>
+      <FormServiciosClient />
     </>
   )
 }
-
-export default FormServiciosPage
