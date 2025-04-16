@@ -13,3 +13,8 @@ npm i mongodb
 
 # Install bcrypt for password hashing
 npm i bcrypt
+
+# Install leaflet for maps
+npm install react-leaflet leaflet
+npm install axios
+

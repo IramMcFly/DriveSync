@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { MapPin, ChevronDown } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 const ServiceForm = ({ serviceType }) => {
   const [formData, setFormData] = useState({
@@ -14,7 +15,6 @@ const ServiceForm = ({ serviceType }) => {
     servicioGrua: "",
     tipoServicio: "",
     servicioLimpieza: "",
-    useLocation: false,
   })
 
   const [price, setPrice] = useState(null)
@@ -62,10 +62,26 @@ const ServiceForm = ({ serviceType }) => {
     })
   }
 
+  const router = useRouter()
+
   const handleSubmit = (e) => {
     e.preventDefault()
-    console.log("Formulario enviado:", formData)
-    alert("Servicio solicitado con éxito")
+
+    if (typeof window !== "undefined" && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords
+          router.push(`/asistente?lat=${latitude}&lng=${longitude}`)
+        },
+        (error) => {
+          console.error("Error obteniendo ubicación:", error)
+          alert("No se pudo obtener tu ubicación. Serás redirigido de todas formas.")
+          router.push("/asistente")
+        }
+      )
+    } else {
+      router.push("/asistente")
+    }
   }
 
   const renderSelect = (name, label, options, required = false) => (
@@ -111,24 +127,6 @@ const ServiceForm = ({ serviceType }) => {
     </div>
   )
 
-  const renderLocationToggle = () => (
-    <div className="mb-4 flex items-center justify-between">
-      <div className="flex items-center">
-        <MapPin size={18} className="text-gray-400 mr-2" />
-        <span className="text-white text-sm">Usar la Ubicacion actual</span>
-      </div>
-      <label className="relative inline-flex items-center cursor-pointer">
-        <input
-          type="checkbox"
-          name="useLocation"
-          checked={formData.useLocation}
-          onChange={handleChange}
-          className="sr-only peer"
-        />
-        <div className="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500"></div>
-      </label>
-    </div>
-  )
 
   const tiposValidos = Object.keys(encabezados)
   if (!tiposValidos.includes(serviceType)) {
@@ -163,7 +161,7 @@ const ServiceForm = ({ serviceType }) => {
 
     if (serviceType === "diagnostico") {
       return formData.marca && formData.año
-    }    
+    }
 
     if (serviceType === "cerrajeria") {
       return (
