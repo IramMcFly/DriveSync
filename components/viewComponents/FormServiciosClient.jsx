@@ -8,7 +8,7 @@ export default function FormServiciosClient() {
   const tipo = searchParams.get("tipo")
 
   return (
-    <main className="min-h-screen bg-black p-6">
+    <main className="min-h-screen bg-[#1a1a1a] text-white p-6 pb-20">
       <ServiceForm serviceType={tipo} />
     </main>
   )
