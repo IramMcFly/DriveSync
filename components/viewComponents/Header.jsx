@@ -69,7 +69,7 @@ export default function Header() {
             >
               <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 p-4 md:p-0 md:ml-64">
                 {navigationLinks.map((link) => (
-                  <NavItem 
+                  <NavItem
                     key={link.href}
                     href={link.href}
                     active={pathname === link.href}
@@ -87,24 +87,24 @@ export default function Header() {
               </button>
             </div>
 
-            <button
-              className="md:hidden text-white hover:bg-orange-800/20 p-2 rounded-full ml-2"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-            >
-              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
+            {!isMobile && (
+              <button
+                className="md:hidden text-white hover:bg-orange-800/20 p-2 rounded-full ml-2"
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+              >
+                {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              </button>
+            )}
+
           </div>
         </div>
       </header>
-
-      {/* Contenido principal con padding para la barra inferior en móviles */}
-      <main className={`flex-1 ${isMobile ? "pb-16" : ""}`}>{/* Aquí va el contenido de tu aplicación */}</main>
 
       {/* Barra de navegación inferior para móviles */}
       {isMobile && (
         <nav className="fixed bottom-0 left-0 right-0 bg-gradient-to-r from-[#5D2A0C] to-[#8B4513] text-white h-16 flex items-center justify-around z-50 shadow-[0_-2px_10px_rgba(0,0,0,0.1)]">
           {navigationLinks.map((link) => (
-            <MobileNavItem 
+            <MobileNavItem
               key={link.href}
               href={link.href}
               icon={React.cloneElement(link.icon, { size: 24 })}
@@ -122,9 +122,8 @@ function NavItem({ href, children, active, icon }) {
   return (
     <Link
       href={href}
-      className={`px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center ${
-        active ? "bg-orange-600 text-white" : "text-white hover:bg-orange-700/30"
-      }`}
+      className={`px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center ${active ? "bg-orange-600 text-white" : "text-white hover:bg-orange-700/30"
+        }`}
     >
       {icon && <span className="mr-2">{icon}</span>}
       {children}

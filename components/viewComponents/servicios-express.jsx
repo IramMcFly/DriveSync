@@ -44,38 +44,41 @@ export default function ServiciosExpress() {
       alt: "Cerrajero abriendo puerta de auto",
     },
   ]
-  
 
   return (
-    <section className="container mx-auto px-4 py-8">
-      <h2 className="text-4xl font-bold text-white text-center mb-10">Servicios Express</h2>
+    <div className="min-h-screen bg-[#1a1a1a] text-white pb-20 md:pb-0">
+      <section className="max-w-7xl mx-auto px-4 py-8">
+        <h2 className="text-4xl font-bold text-center mb-10">Servicios Express</h2>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-        {servicios.map((servicio) => (
-          <div
-            key={servicio.id}
-            className="bg-[#1E1E1E] border border-[#333] rounded-xl shadow-md hover:shadow-orange-500/30 transition-all duration-300 flex flex-col items-center text-center overflow-hidden"
-          >
-            <div className="w-full h-48 relative">
-              <Image
-                src={servicio.image}
-                alt={servicio.alt}
-                fill
-                className="object-cover w-full h-full"
-              />
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {servicios.map((servicio) => (
+            <div
+              key={servicio.id}
+              className="bg-[#1E1E1E] border border-[#333] rounded-xl shadow-md hover:shadow-orange-500/30 transition-all duration-300 flex flex-col overflow-hidden"
+            >
+              <div className="relative h-52 md:h-60">
+                <Image
+                  src={servicio.image}
+                  alt={servicio.alt}
+                  fill
+                  className="object-cover"
+                />
+              </div>
+              <div className="p-4 flex flex-col gap-2">
+                <div>
+                  <h3 className="text-lg font-semibold text-white">{servicio.title}</h3>
+                  <p className="text-sm text-gray-300 mt-1">Desde: {servicio.price}</p>
+                </div>
+                <Link href={`/formServicios?tipo=${encodeURIComponent(servicio.tipo)}`}>
+                  <button className="w-full bg-orange-600 hover:bg-orange-700 text-white py-2 rounded-md text-sm">
+                    Solicitar
+                  </button>
+                </Link>
+              </div>
             </div>
-            <div className="p-4 space-y-2 w-full">
-              <h3 className="text-white text-lg font-semibold">{servicio.title}</h3>
-              <p className="text-gray-300 text-sm">Desde: {servicio.price}</p>
-              <Link href={`/formServicios?tipo=${encodeURIComponent(servicio.tipo)}`}>
-                <button className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg text-sm transition duration-300">
-                  Solicitar
-                </button>
-              </Link>
-            </div>
-          </div>
-        ))}
-      </div>
-    </section>
+          ))}
+        </div>
+      </section>
+    </div>
   )
 }
