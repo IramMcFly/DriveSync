@@ -17,7 +17,8 @@ const ServiceForm = ({ serviceType }) => {
     servicioLimpieza: "",
   })
 
-  const [price, setPrice] = useState(null)
+  const [price, setPrice] = useState(0)
+  const [showMultiplicadorNote, setShowMultiplicadorNote] = useState(false)
 
   const marcas = ["Toyota", "Honda", "Ford", "Chevrolet", "Nissan", "Volkswagen", "Otro"]
   const metodosPago = ["Tarjeta", "Efectivo"]
@@ -26,6 +27,24 @@ const ServiceForm = ({ serviceType }) => {
   const serviciosGrua = ["Arrastre completo"]
   const serviciosLimpieza = ["Lavado exterior", "Lavado completo", "Detallado"]
 
+  const preciosServicios = {
+    asistencia: 183.3,
+    "Arrastre completo": 341.56,
+    "Lavado exterior": 120,
+    "Lavado completo": 250,
+    Detallado: 450,
+    diagnostico: 120,
+    cerrajeria: 430,
+  }
+
+  const multiplicadoresTipoVehiculo = {
+    "Sedán": 1,
+    "Hatchback": 1,
+    "SUV": 1.2,
+    "Pickup": 1.3,
+    "Minivan": 1.25,
+  }
+
   const encabezados = {
     asistencia: "Asistencia Vehicular",
     grua: "Servicio de Grúa",
@@ -33,6 +52,17 @@ const ServiceForm = ({ serviceType }) => {
     diagnostico: "Diagnóstico del Vehículo",
     cerrajeria: "Servicio de Cerrajería"
   }
+
+  const generarAnios = () => {
+    const anios = []
+    const anioActual = new Date().getFullYear()
+    for (let anio = anioActual; anio >= 1950; anio--) {
+      anios.push(anio)
+    }
+    return anios
+  }
+
+  const aniosVehiculos = generarAnios()
 
   const router = useRouter()
 
@@ -45,36 +75,37 @@ const ServiceForm = ({ serviceType }) => {
     return false
   }
 
+  const calcularPrecio = () => {
+    let total = 0
+    setShowMultiplicadorNote(false)
+
+    if (serviceType === "asistencia") {
+      total += preciosServicios.asistencia || 0
+    }
+    if (serviceType === "grua" && formData.servicioGrua) {
+      total += preciosServicios[formData.servicioGrua] || 0
+    }
+    if (serviceType === "limpieza" && formData.servicioLimpieza) {
+      const basePrice = preciosServicios[formData.servicioLimpieza] || 0
+      const multiplicador = multiplicadoresTipoVehiculo[formData.tipoVehiculo] || 1
+      total += basePrice * multiplicador
+      if (multiplicador > 1) setShowMultiplicadorNote(true)
+    }
+    if (serviceType === "diagnostico") {
+      total += preciosServicios.diagnostico || 0
+    }
+    if (serviceType === "cerrajeria") {
+      total += preciosServicios.cerrajeria || 0
+    }
+    setPrice(total)
+  }
+
   useEffect(() => {
     if (!isFormValid()) {
-      setPrice(null)
+      setPrice(0)
       return
     }
-
-    switch (serviceType) {
-      case "asistencia":
-        setPrice(183.3)
-        break
-      case "grua":
-        setPrice(341.56)
-        break
-      case "limpieza":
-        const preciosLimpieza = {
-          "Lavado exterior": 120,
-          "Lavado completo": 250,
-          Detallado: 450,
-        }
-        setPrice(preciosLimpieza[formData.servicioLimpieza] || null)
-        break
-      case "diagnostico":
-        setPrice(120)
-        break
-      case "cerrajeria":
-        setPrice(430)
-        break
-      default:
-        setPrice(null)
-    }
+    calcularPrecio()
   }, [formData, serviceType])
 
   const handleChange = (e) => {
@@ -84,6 +115,11 @@ const ServiceForm = ({ serviceType }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault()
+    if (!isFormValid() || formData.año === "") {
+      alert("Por favor, completa todos los campos obligatorios correctamente.")
+      return
+    }
+
     if (typeof window !== "undefined" && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         ({ coords }) => router.push(`/asistente?lat=${coords.latitude}&lng=${coords.longitude}`),
@@ -99,11 +135,12 @@ const ServiceForm = ({ serviceType }) => {
   const renderSelect = (name, label, options, required = false) => (
     <div className="mb-4">
       <div className="flex justify-between items-center mb-1">
-        <label className="text-white text-sm">{label}</label>
+        <label className="text-white text-sm" htmlFor={name}>{label}</label>
         {required && <span className="text-xs text-gray-400">Requerido</span>}
       </div>
       <div className="relative">
         <select
+          id={name}
           name={name}
           value={formData[name]}
           onChange={handleChange}
@@ -123,10 +160,11 @@ const ServiceForm = ({ serviceType }) => {
   const renderInput = (name, label, type = "text", required = false) => (
     <div className="mb-4">
       <div className="flex justify-between items-center mb-1">
-        <label className="text-white text-sm">{label}</label>
+        <label className="text-white text-sm" htmlFor={name}>{label}</label>
         {required && <span className="text-xs text-gray-400">Requerido</span>}
       </div>
       <input
+        id={name}
         type={type}
         name={name}
         value={formData[name]}
@@ -151,7 +189,7 @@ const ServiceForm = ({ serviceType }) => {
             <>
               {renderSelect("marca", "Marca", marcas, true)}
               {renderInput("modelo", "Modelo", "text", true)}
-              {renderInput("año", "Año", "number", true)}
+              {renderSelect("año", "Año", aniosVehiculos, true)}
               {renderSelect("metodoPago", "Método de Pago", metodosPago, true)}
               {renderSelect("tallerServicio", "Taller del Servicio", talleres)}
             </>
@@ -183,7 +221,7 @@ const ServiceForm = ({ serviceType }) => {
           {serviceType === "diagnostico" && (
             <>
               {renderSelect("marca", "Marca", marcas, true)}
-              {renderInput("año", "Año", "number", true)}
+              {renderSelect("año", "Año", aniosVehiculos, true)}
             </>
           )}
 
@@ -191,15 +229,18 @@ const ServiceForm = ({ serviceType }) => {
             <>
               {renderSelect("marca", "Marca", marcas, true)}
               {renderInput("modelo", "Modelo", "text", true)}
-              {renderInput("año", "Año", "number", true)}
+              {renderSelect("año", "Año", aniosVehiculos, true)}
               {renderSelect("metodoPago", "Método de Pago", metodosPago, true)}
             </>
           )}
 
-          {isFormValid() && price && (
+          {isFormValid() && price > 0 && (
             <div className="mb-4 mt-4">
               <p className="text-white text-sm mb-1">Total estimado:</p>
               <p className="text-white text-2xl font-bold">${price.toFixed(2)} <span className="text-sm text-gray-400">MXN</span></p>
+              {showMultiplicadorNote && (
+                <p className="text-xs text-yellow-400 mt-2">Incluye ajuste por tipo de vehículo (SUV, Pickup o Minivan).</p>
+              )}
             </div>
           )}
 
