@@ -67,12 +67,20 @@ function decodePolyline(encoded) {
   return points
 }
 
+// ⚡ Aquí definimos isValidCoords donde todos lo pueden usar
+const isValidCoords = (coords) => 
+  Array.isArray(coords) && coords.length === 2 && 
+  typeof coords[0] === "number" && typeof coords[1] === "number"
+
 export default function LeafletMap({ userLocation, assistantLocation }) {
   const [ruta, setRuta] = useState([])
 
   useEffect(() => {
     const fetchRuta = async () => {
-      if (!userLocation || !assistantLocation) return
+      if (!isValidCoords(userLocation) || !isValidCoords(assistantLocation)) {
+        console.warn("⚠️ Ubicaciones inválidas, no se puede calcular la ruta.")
+        return
+      }
 
       const coordinates = [
         [assistantLocation[1], assistantLocation[0]],
@@ -115,14 +123,14 @@ export default function LeafletMap({ userLocation, assistantLocation }) {
   }, [userLocation, assistantLocation])
 
   return (
-    <MapContainer center={userLocation} zoom={13} scrollWheelZoom={false} className="w-full h-full z-0">
+    <MapContainer center={userLocation || [0, 0]} zoom={13} scrollWheelZoom={false} className="w-full h-full z-0">
       <Recenter coords={userLocation} />
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
-      <Marker position={userLocation} />
-      <Marker position={assistantLocation} icon={carIcon} />
+      {isValidCoords(userLocation) && <Marker position={userLocation} />}
+      {isValidCoords(assistantLocation) && <Marker position={assistantLocation} icon={carIcon} />}
       {ruta.length > 0 && (
         <Polyline positions={ruta} pathOptions={{ color: "orange", weight: 4 }} />
       )}

@@ -4,6 +4,8 @@ import dynamic from "next/dynamic"
 import Image from "next/image"
 import { AlertCircle } from "lucide-react"
 import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+import { motion, AnimatePresence } from "framer-motion"
 
 const MapComponent = dynamic(() => import("@/components/viewComponents/LeafletMap"), { ssr: false })
 
@@ -28,6 +30,9 @@ export default function AsistenteEnCamino({ userLocation, assistantLocation }) {
   const [distancia, setDistancia] = useState(null)
   const [tiempo, setTiempo] = useState(null)
   const [ready, setReady] = useState(false)
+  const [showPanicModal, setShowPanicModal] = useState(false)
+
+  const router = useRouter()
 
   useEffect(() => {
     const km = haversineDistance(userLocation, assistantLocation)
@@ -38,12 +43,60 @@ export default function AsistenteEnCamino({ userLocation, assistantLocation }) {
     const minutos = Math.round(tiempoEnHoras * 60)
     setTiempo(minutos)
 
-    // Espera un poco para asegurar que el contenedor tenga altura antes de renderizar el mapa
     setTimeout(() => setReady(true), 100)
   }, [userLocation, assistantLocation])
 
+  const handlePanic = () => {
+    setShowPanicModal(true)
+  }
+
+  const confirmPanic = () => {
+    setShowPanicModal(false)
+    window.location.href = "tel:911"
+  }
+
+  const handleCallAssistant = () => {
+    window.location.href = "tel:6142330980"
+  }
+
+  const handleCancelService = () => {
+    router.push("/view")
+  }
+
   return (
     <div className="min-h-screen bg-[#0f0f0f] text-white flex flex-col items-center px-4 py-6">
+      <AnimatePresence>
+        {showPanicModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50"
+          >
+            <motion.div
+              initial={{ scale: 0.7 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.7 }}
+              className="bg-[#1E1E1E] p-6 rounded-lg shadow-lg text-center w-80"
+            >
+              <motion.div
+                animate={{ rotate: [0, 20, -20, 20, -20, 0] }}
+                transition={{ duration: 1, repeat: Infinity }}
+                className="text-4xl mb-4"
+              >🚨</motion.div>
+              <h2 className="text-xl font-bold mb-2">Emergencia</h2>
+              <p className="text-gray-300 mb-6">Se ha enviado tu ubicación a tus contactos de emergencia.</p>
+              <button
+                onClick={confirmPanic}
+                className="bg-orange-600 hover:bg-orange-700 text-white font-semibold py-2 px-4 rounded-md w-full"
+              >
+                Aceptar
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="bg-[#431e12] text-white px-6 py-2 rounded-full mb-4 shadow-lg text-center font-semibold text-lg">
         Asistente en camino...
       </div>
@@ -68,16 +121,25 @@ export default function AsistenteEnCamino({ userLocation, assistantLocation }) {
         </div>
 
         <div className="flex justify-between px-4 py-3 gap-3 flex-wrap bg-[#1a1a1a] border-t border-gray-700">
-          <button className="flex-1 bg-gray-800 hover:bg-gray-700 text-white py-2 px-4 rounded-md">
+          <button
+            onClick={handleCancelService}
+            className="flex-1 bg-gray-800 hover:bg-gray-700 text-white py-2 px-4 rounded-md"
+          >
             Cancelar Servicio
           </button>
-          <button className="flex-1 bg-gray-800 hover:bg-gray-700 text-white py-2 px-4 rounded-md">
+          <button
+            onClick={handleCallAssistant}
+            className="flex-1 bg-gray-800 hover:bg-gray-700 text-white py-2 px-4 rounded-md"
+          >
             Llamar al asistente
           </button>
         </div>
 
         <div className="p-4 bg-[#1a1a1a] border-t border-gray-700">
-          <button className="w-full bg-orange-600 hover:bg-orange-700 text-white font-semibold py-3 rounded-md shadow-md flex items-center justify-center gap-2">
+          <button
+            onClick={handlePanic}
+            className="w-full bg-orange-600 hover:bg-orange-700 text-white font-semibold py-3 rounded-md shadow-md flex items-center justify-center gap-2"
+          >
             <AlertCircle size={18} className="text-white" />
             Botón de pánico
           </button>
