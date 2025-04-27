@@ -23,8 +23,7 @@ const ServiceForm = ({ serviceType }) => {
   const metodosPago = ["Tarjeta", "Efectivo"]
   const talleres = ["Taller Mecánico AutoAvante", "Garage Orona", "Multiservicios Almeraz"]
   const tiposVehiculo = ["Sedán", "SUV", "Pickup", "Hatchback", "Minivan"]
-  const serviciosGrua = ["Arrastre completo", "Cambio de llanta", "Carga de batería"]
-  const tiposServicio = ["Básico", "Completo", "Premium"]
+  const serviciosGrua = ["Arrastre completo"]
   const serviciosLimpieza = ["Lavado exterior", "Lavado completo", "Detallado"]
 
   const encabezados = {
