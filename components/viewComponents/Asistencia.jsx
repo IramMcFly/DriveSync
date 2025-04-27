@@ -1,20 +1,18 @@
 "use client"
 import { Phone, MessageCircle } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 const Asistencia = () => {
+  const router = useRouter()
+
   // Función para manejar la llamada de asistencia
   const handleLlamada = () => {
-    // Aquí puedes implementar la lógica para iniciar una llamada
-    // Por ejemplo, usando tel: para dispositivos móviles
-    window.location.href = "tel:+123456789"
+    window.location.href = "tel:+526141110404"
   }
 
   // Función para manejar el inicio de chat
   const handleChat = () => {
-    // Aquí puedes implementar la lógica para iniciar un chat
-    console.log("Iniciando chat con IA...")
-    // Ejemplo: redirigir a una página de chat
-    // window.location.href = '/chat'
+    router.push("/aiAssist")
   }
 
   return (
@@ -24,8 +22,8 @@ const Asistencia = () => {
 
         {/* Sección de Asistencia telefónica */}
         <section className="mb-8">
-          <h2 className="text-2xl font-bold mb-2">Asistencia telefonica</h2>
-          <p className="text-gray-400 mb-4">No te pongas en riesgo, obten una llamada para obtener asistencia.</p>
+          <h2 className="text-2xl font-bold mb-2">Asistencia telefónica</h2>
+          <p className="text-gray-400 mb-4">No te pongas en riesgo, obtén una llamada para asistencia.</p>
           <button
             onClick={handleLlamada}
             className="w-full bg-[#E85D04] hover:bg-[#F48C06] text-white py-3 px-4 rounded-md flex items-center justify-center transition-colors"
@@ -40,7 +38,7 @@ const Asistencia = () => {
 
         {/* Sección de Atención 24/7 */}
         <section>
-          <h2 className="text-2xl font-bold mb-2">Atencion 24/7</h2>
+          <h2 className="text-2xl font-bold mb-2">Atención 24/7</h2>
           <p className="text-gray-400 mb-4">
             Chatea con una IA que te ayude a resolver los diferentes problemas que puedas tener.
           </p>
@@ -58,4 +56,3 @@ const Asistencia = () => {
 }
 
 export default Asistencia
-

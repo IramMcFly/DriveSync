@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Send } from "lucide-react";
 import Link from "next/link";
 
@@ -15,21 +15,11 @@ const serviciosDisponibles = [
 function detectarServicios(texto) {
   const serviciosDetectados = [];
 
-  if (/asistencia|ayuda|motor|batería/i.test(texto)) {
-    serviciosDetectados.push("asistencia");
-  }
-  if (/grúa|remolque|arrastre/i.test(texto)) {
-    serviciosDetectados.push("grua");
-  }
-  if (/diagnóstico|scanner|falla|problema/i.test(texto)) {
-    serviciosDetectados.push("diagnostico");
-  }
-  if (/limpieza|lavado|detallado/i.test(texto)) {
-    serviciosDetectados.push("limpieza");
-  }
-  if (/cerrajería|cerradura|llaves/i.test(texto)) {
-    serviciosDetectados.push("cerrajeria");
-  }
+  if (/asistencia|ayuda|motor|batería/i.test(texto)) serviciosDetectados.push("asistencia");
+  if (/grúa|remolque|arrastre/i.test(texto)) serviciosDetectados.push("grua");
+  if (/diagnóstico|scanner|falla|problema/i.test(texto)) serviciosDetectados.push("diagnostico");
+  if (/limpieza|lavado|detallado/i.test(texto)) serviciosDetectados.push("limpieza");
+  if (/cerrajería|cerradura|llaves/i.test(texto)) serviciosDetectados.push("cerrajeria");
 
   if (serviciosDetectados.length === 0) {
     return serviciosDisponibles.map((s) => s.tipo);
@@ -42,6 +32,7 @@ export default function AsistenteEspecializado() {
   const [userMessage, setUserMessage] = useState("");
   const [chat, setChat] = useState([]);
   const [loading, setLoading] = useState(false);
+  const bottomRef = useRef(null);
 
   const handleSend = async () => {
     if (!userMessage.trim()) return;
@@ -54,62 +45,70 @@ export default function AsistenteEspecializado() {
     try {
       const response = await fetch("/api/chat", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           model: "mixtral-8x7b-32768",
           messages: [
             {
               role: "system",
-              content: "Eres un asistente automotriz llamado DriveSync Services. Ofreces servicios de asistencia vehicular, servicio de grúa, diagnóstico vehicular, limpieza de vehículos y cerrajería automotriz. Da respuestas de máximo 3-4 líneas y ofrece de forma amable contratar uno de nuestros servicios si es oportuno."
+              content:
+                "Eres un asistente automotriz llamado DriveSync Services. Ofreces servicios de asistencia vehicular, servicio de grúa, diagnóstico vehicular, limpieza de vehículos y cerrajería automotriz. Da respuestas de máximo 3-4 líneas y ofrece de forma amable contratar uno de nuestros servicios si es oportuno.",
             },
-            ...newChat
-          ]
-        })
+            ...newChat,
+          ],
+        }),
       });
 
       const data = await response.json();
       const aiResponse = data.choices?.[0]?.message?.content || "No pude procesar tu solicitud, intenta de nuevo.";
 
-      setChat(prev => [...prev, { role: "assistant", content: aiResponse }]);
+      setChat((prev) => [...prev, { role: "assistant", content: aiResponse }]);
     } catch (error) {
       console.error("Error al comunicar con el servidor:", error);
-      setChat(prev => [...prev, { role: "assistant", content: "Hubo un error. Por favor intenta más tarde." }]);
+      setChat((prev) => [...prev, { role: "assistant", content: "Hubo un error. Por favor intenta más tarde." }]);
     } finally {
       setLoading(false);
     }
   };
 
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [chat, loading]);
+
   return (
-    <div className="bg-[#1a1a1a] min-h-screen text-white flex flex-col py-8 pb-24">
-      <div className="max-w-2xl w-full mx-auto bg-[#1E1E1E] rounded-lg shadow-md border border-[#333] flex flex-col flex-1">
+    <div className="bg-[#1a1a1a] min-h-screen text-white flex flex-col">
+      {/* Ya no restamos 64px aquí */}
+      <div className="flex flex-col flex-1 max-w-2xl w-full mx-auto bg-[#1E1E1E] rounded-lg shadow-md border border-[#333] overflow-hidden">
         <div className="p-4 border-b border-[#333] text-center">
           <h1 className="text-2xl font-bold">Asistente Especializado</h1>
           <p className="text-gray-400 text-sm mt-1">Consulta rápida para emergencias automotrices</p>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-4 space-y-6">
+        {/* Chat Messages */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-6 pb-32"> 
+          {/* ✅ Aquí el truco: padding-bottom extra para no tapar el input */}
           {chat.map((message, index) => (
             <div key={index}>
               <div
-                className={`p-3 rounded-lg ${message.role === "user"
-                  ? "bg-orange-600/30 self-end text-right"
-                  : "bg-[#333] self-start text-left"}`}
+                className={`p-3 rounded-lg ${
+                  message.role === "user"
+                    ? "bg-orange-600/30 self-end text-right"
+                    : "bg-[#333] self-start text-left"
+                }`}
               >
                 <p className="text-sm whitespace-pre-line">{message.content}</p>
               </div>
-              {/* Botones de servicios solo para respuestas de IA */}
-              {message.role === "assistant" && detectarServicios(message.content).map((tipo) => {
-                const servicio = serviciosDisponibles.find((s) => s.tipo === tipo);
-                return (
-                  <Link key={tipo} href={`/formServicios?tipo=${encodeURIComponent(tipo)}`}>
-                    <button className="mt-2 mr-2 bg-orange-600 hover:bg-orange-700 text-white py-2 px-4 rounded-lg text-xs">
-                      {servicio.label}
-                    </button>
-                  </Link>
-                );
-              })}
+              {message.role === "assistant" &&
+                detectarServicios(message.content).map((tipo) => {
+                  const servicio = serviciosDisponibles.find((s) => s.tipo === tipo);
+                  return (
+                    <Link key={tipo} href={`/formServicios?tipo=${encodeURIComponent(tipo)}`}>
+                      <button className="mt-2 mr-2 bg-orange-600 hover:bg-orange-700 text-white py-2 px-4 rounded-lg text-xs">
+                        {servicio.label}
+                      </button>
+                    </Link>
+                  );
+                })}
             </div>
           ))}
 
@@ -118,9 +117,12 @@ export default function AsistenteEspecializado() {
               <p className="text-sm text-gray-400">El asistente está escribiendo...</p>
             </div>
           )}
+          <div ref={bottomRef} />
         </div>
 
-        <div className="p-4 border-t border-[#333] flex items-center gap-2">
+        {/* Input abajo */}
+        <div className="fixed bottom-16 left-0 right-0 flex items-center gap-2 p-4 bg-[#1a1a1a] max-w-2xl mx-auto">
+          {/* ✅ Le damos "bottom-16" para que no choque con el navbar */}
           <input
             type="text"
             placeholder="Describe tu problema..."
