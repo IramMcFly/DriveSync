@@ -67,12 +67,16 @@ const ServiceForm = ({ serviceType }) => {
   const router = useRouter()
 
   const isFormValid = () => {
-    if (serviceType === "asistencia") return formData.marca && formData.modelo && formData.año && formData.metodoPago
-    if (serviceType === "grua") return formData.tipoVehiculo && formData.metodoPago && formData.servicioGrua
-    if (serviceType === "limpieza") return formData.tipoVehiculo && formData.servicioLimpieza && formData.metodoPago
-    if (serviceType === "diagnostico") return formData.marca && formData.año
-    if (serviceType === "cerrajeria") return formData.marca && formData.modelo && formData.año && formData.metodoPago
-    return false
+    const requiredFields = {
+      asistencia: ["marca", "modelo", "año", "metodoPago"],
+      grua: ["tipoVehiculo", "metodoPago", "servicioGrua"],
+      limpieza: ["tipoVehiculo", "servicioLimpieza", "metodoPago"],
+      diagnostico: ["marca", "año"],
+      cerrajeria: ["marca", "modelo", "año", "metodoPago"],
+    }
+
+    const fields = requiredFields[serviceType] || []
+    return fields.every(field => formData[field] && formData[field] !== "")
   }
 
   const calcularPrecio = () => {
@@ -109,13 +113,13 @@ const ServiceForm = ({ serviceType }) => {
   }, [formData, serviceType])
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target
-    setFormData({ ...formData, [name]: type === "checkbox" ? checked : value })
+    const { name, value } = e.target
+    setFormData(prev => ({ ...prev, [name]: value }))
   }
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    if (!isFormValid() || formData.año === "") {
+    if (!isFormValid()) {
       alert("Por favor, completa todos los campos obligatorios correctamente.")
       return
     }
@@ -142,7 +146,7 @@ const ServiceForm = ({ serviceType }) => {
         <select
           id={name}
           name={name}
-          value={formData[name]}
+          value={formData[name] || ""}
           onChange={handleChange}
           className="w-full bg-[#333333] text-white py-3 px-4 rounded-md appearance-none"
           required={required}
@@ -167,7 +171,7 @@ const ServiceForm = ({ serviceType }) => {
         id={name}
         type={type}
         name={name}
-        value={formData[name]}
+        value={formData[name] || ""}
         onChange={handleChange}
         className="w-full bg-[#333333] text-white py-3 px-4 rounded-md"
         required={required}
@@ -199,7 +203,7 @@ const ServiceForm = ({ serviceType }) => {
             <>
               {renderSelect("tipoVehiculo", "Tipo de Vehiculo", tiposVehiculo, true)}
               {renderSelect("metodoPago", "Método de Pago", metodosPago, true)}
-              {renderSelect("servicioGrua", "Servicio de grúa", serviciosGrua)}
+              {renderSelect("servicioGrua", "Servicio de grúa", serviciosGrua, true)}
             </>
           )}
 
