@@ -88,16 +88,7 @@ export default function LeafletMap({ userLocation, assistantLocation }) {
       ]
 
       try {
-        const response = await axios.post(
-          "https://api.openrouteservice.org/v2/directions/driving-car",
-          { coordinates },
-          {
-            headers: {
-              Authorization: "5b3ce3597851110001cf6248d03553dc48d5497b849e4f022926caca",
-              "Content-Type": "application/json",
-            },
-          }
-        )
+        const response = await axios.post("/api/ruta", { coordinates })
 
         const geometry = response.data?.routes?.[0]?.geometry
         if (!geometry || !geometry?.coordinates) {
