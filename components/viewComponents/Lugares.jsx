@@ -21,18 +21,6 @@ const Lugares = () => {
       imagen: "/images/prodynamics.jpg",
     },
     {
-      id: 3,
-      nombre: "AutoZone Cuauthemoc #7062",
-      descripcion: "Tienda Especializada de Vehículos",
-      imagen: "/images/autozone.jpg",
-    },
-    {
-      id: 4,
-      nombre: "Marlo Gasolinera Cuauthemoc",
-      descripcion: "Gasolinera Top Tier",
-      imagen: "/images/marlo.jpg",
-    },
-    {
       id: 5,
       nombre: "Marlo Gasolinera Chihuahua",
       descripcion: "Gasolinera Top Tier",
@@ -42,7 +30,7 @@ const Lugares = () => {
       id: 6,
       nombre: "Multiservicios Almeraz",
       descripcion: "Servicios Rápidos y Económicos",
-      imagen: "/placeholder.svg",
+      imagen: "/images/almeraz.jpg",
     },
     {
       id: 7,
@@ -51,34 +39,28 @@ const Lugares = () => {
       imagen: "/images/autozone.jpg",
     },
     {
-      id: 8,
-      nombre: "FireStone Cuauthemoc",
-      descripcion: "Tienda Especializada en llantas",
-      imagen: "/placeholder.svg",
-    },
-    {
       id: 9,
       nombre: 'Taller Automotriz "Garage Orona"',
       descripcion: "Taller Mecánico",
-      imagen: "/placeholder.svg",
+      imagen: "/images/orna.jpg",
     },
     {
       id: 10,
       nombre: "Taller Mecánico AutoAvante",
       descripcion: "Taller Mecánico",
-      imagen: "/placeholder.svg",
+      imagen: "/images/autoavante.png",
     },
     {
       id: 11,
       nombre: "VipCare Autolavado",
       descripcion: "Auto lavado de servicio",
-      imagen: "/placeholder.svg",
+      imagen: "/images/vipcare.png",
     },
     {
       id: 12,
       nombre: "ServicioExpress Autolavado",
       descripcion: "Auto lavado de servicio",
-      imagen: "/placeholder.svg",
+      imagen: "/images/autoexpress.jpg",
     },
   ]
 
