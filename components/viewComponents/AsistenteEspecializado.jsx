@@ -45,7 +45,7 @@ export default function AsistenteEspecializado() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          model: "mixtral-8x7b-32768",
+          model: "llama3-8b-8192",
           messages: [
             {
               role: "system",
@@ -58,10 +58,16 @@ export default function AsistenteEspecializado() {
       });
 
       const data = await response.json();
-      const aiResponse = data.choices?.[0]?.message?.content || "No pude procesar tu solicitud, intenta de nuevo.";
-      setChat((prev) => [...prev, { role: "assistant", content: aiResponse }]);
+
+      if (data.error) {
+        //console.error("⚠️ Error desde la API:", data.error);
+        setChat((prev) => [...prev, { role: "assistant", content: "No se pudo procesar tu mensaje. Verifica la conexión o intenta más tarde." }]);
+      } else {
+        const aiResponse = data.choices?.[0]?.message?.content || "No pude procesar tu solicitud, intenta de nuevo.";
+        setChat((prev) => [...prev, { role: "assistant", content: aiResponse }]);
+      }
     } catch (error) {
-      console.error("Error al comunicar con el servidor:", error);
+     // console.error("❌ Error al comunicar con el servidor:", error);
       setChat((prev) => [...prev, { role: "assistant", content: "Hubo un error. Por favor intenta más tarde." }]);
     } finally {
       setLoading(false);

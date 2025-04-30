@@ -1,9 +1,9 @@
-// app/api/chat/route.js
-import { NextResponse } from "next/server"
+// /app/api/chat/route.js
+import { NextResponse } from "next/server";
 
 export async function POST(req) {
   try {
-    const body = await req.json()
+    const body = await req.json();
 
     const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
@@ -17,13 +17,13 @@ export async function POST(req) {
         temperature: 0.7,
         max_tokens: 1024,
       }),
-    })
+    });
 
-    const data = await res.json()
+    const data = await res.json();
 
-    return NextResponse.json(data)
+    return NextResponse.json(data);
   } catch (error) {
-    console.error("❌ Error al conectar con Groq:", error)
-    return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 })
+    console.error("❌ Error al conectar con Groq:", error);
+    return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
   }
 }
