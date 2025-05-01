@@ -2,17 +2,17 @@
 
 import Link from "next/link"
 import { useState, useEffect } from "react"
+import Image from "next/image"
 import { Zap, MapPin, LifeBuoy, User, Menu, X } from "lucide-react"
 import React from "react"
-import { usePathname } from 'next/navigation'
+import { usePathname } from "next/navigation"
 
 const navigationLinks = [
   {
     name: "Servicios Express",
     href: "/view",
     icon: <Zap size={16} />,
-    component: "ServiciosExpress",
-    active: true
+    component: "ServiciosExpress"
   },
   {
     name: "Lugares Afiliados",
@@ -33,19 +33,13 @@ export default function Header() {
   const [isMobile, setIsMobile] = useState(false)
   const pathname = usePathname()
 
-  // Detectar si es dispositivo móvil
   useEffect(() => {
     const checkIfMobile = () => {
       setIsMobile(window.innerWidth < 768)
     }
-
-    // Verificar al cargar y cuando cambie el tamaño de la ventana
     checkIfMobile()
     window.addEventListener("resize", checkIfMobile)
-
-    return () => {
-      window.removeEventListener("resize", checkIfMobile)
-    }
+    return () => window.removeEventListener("resize", checkIfMobile)
   }, [])
 
   return (
@@ -53,20 +47,16 @@ export default function Header() {
       <header className="sticky top-0 z-40 w-full bg-gradient-to-r from-[#5D2A0C] to-[#8B4513] shadow-md">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="flex h-16 items-center">
-            <div className="flex items-center gap-2 mr-8">
-              <div className="bg-black rounded-full p-2">
-                <Zap size={20} className="text-orange-500" />
-              </div>
-              <span className="font-bold text-white text-lg">DriveSync Servicios</span>
+            <div className="flex items-center gap-3 mr-8">
+              <Link href="/view" className="flex items-center gap-3">
+                <div className="rounded-full overflow-hidden w-9 h-9">
+                  <Image src="/images/logoDS.png" alt="DriveSync logo" width={36} height={36} />
+                </div>
+                <span className="font-bold text-white text-lg">DriveSync Servicios</span>
+              </Link>
             </div>
 
-            <nav
-              className={`
-              absolute left-0 right-0 top-16 bg-[#5D2A0C] md:bg-transparent
-              md:static md:flex md:items-center
-              ${isMenuOpen ? "block" : "hidden md:flex"}
-            `}
-            >
+            <nav className={`absolute left-0 right-0 top-16 bg-[#5D2A0C] md:bg-transparent md:static md:flex md:items-center ${isMenuOpen ? "block" : "hidden md:flex"}`}>
               <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 p-4 md:p-0 md:ml-64">
                 {navigationLinks.map((link) => (
                   <NavItem
@@ -95,12 +85,10 @@ export default function Header() {
                 {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
               </button>
             )}
-
           </div>
         </div>
       </header>
 
-      {/* Barra de navegación inferior para móviles */}
       {isMobile && (
         <nav className="fixed bottom-0 left-0 right-0 bg-gradient-to-r from-[#5D2A0C] to-[#8B4513] text-white h-16 flex items-center justify-around z-50 shadow-[0_-2px_10px_rgba(0,0,0,0.1)]">
           {navigationLinks.map((link) => (
@@ -122,8 +110,7 @@ function NavItem({ href, children, active, icon }) {
   return (
     <Link
       href={href}
-      className={`px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center ${active ? "bg-orange-600 text-white" : "text-white hover:bg-orange-700/30"
-        }`}
+      className={`px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center ${active ? "bg-orange-600 text-white" : "text-white hover:bg-orange-700/30"}`}
     >
       {icon && <span className="mr-2">{icon}</span>}
       {children}
@@ -139,4 +126,3 @@ function MobileNavItem({ href, children, icon }) {
     </Link>
   )
 }
-
