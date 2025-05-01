@@ -4,7 +4,7 @@ import dynamic from "next/dynamic"
 import Image from "next/image"
 import { AlertCircle } from "lucide-react"
 import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 
 const MapComponent = dynamic(() => import("@/components/viewComponents/LeafletMap"), { ssr: false })
@@ -33,6 +33,37 @@ export default function AsistenteEnCamino({ userLocation, assistantLocation }) {
   const [showPanicModal, setShowPanicModal] = useState(false)
 
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const tipoServicio = searchParams.get("tipo") || "asistencia"
+
+  const asistentes = {
+    asistencia: {
+      nombre: "Juan Morales",
+      telefono: "6142330980",
+      placas: "DXZ-679-B",
+      imagen: "/images/asistentes-images/asistente-juan-morales.jpg",
+    },
+    grua: {
+      nombre: "Esteban Octavio",
+      telefono: "6142449870",
+      placas: "GRU-421-Z",
+      imagen: "/images/asistentes-images/asistente-esteban-octavio.jpg",
+    },
+    limpieza: {
+      nombre: "Fernando Tornell",
+      telefono: "6142663321",
+      placas: "LMP-872-W",
+      imagen: "/images/asistentes-images/asistente-chuy.jpeg",
+    },
+    diagnostico: {
+      nombre: "Guillermo Aguirre",
+      telefono: "6142990011",
+      placas: "DIA-110-K",
+      imagen: "/images/asistentes-images/asistente-memo.png",
+    },
+  }
+
+  const asistente = asistentes[tipoServicio] || asistentes.asistencia
 
   useEffect(() => {
     const km = haversineDistance(userLocation, assistantLocation)
@@ -56,7 +87,7 @@ export default function AsistenteEnCamino({ userLocation, assistantLocation }) {
   }
 
   const handleCallAssistant = () => {
-    window.location.href = "tel:6142330980"
+    window.location.href = `tel:${asistente.telefono}`
   }
 
   const handleCancelService = () => {
@@ -148,7 +179,7 @@ export default function AsistenteEnCamino({ userLocation, assistantLocation }) {
         <div className="text-center px-6 py-6 bg-[#1E1E1E]">
           <div className="w-28 h-28 mx-auto mb-3 rounded-full overflow-hidden border-4 border-orange-500 shadow-md">
             <Image
-              src="/images/asistente.jpg"
+              src={asistente.imagen}
               width={112}
               height={112}
               alt="Asistente"
@@ -160,13 +191,13 @@ export default function AsistenteEnCamino({ userLocation, assistantLocation }) {
 
           <div className="text-sm text-gray-300 space-y-1">
             <p>
-              <span className="text-white font-semibold">Nombre:</span> Juan Morales
+              <span className="text-white font-semibold">Nombre:</span> {asistente.nombre}
             </p>
             <p>
-              <span className="text-white font-semibold">Teléfono:</span> 6142330980
+              <span className="text-white font-semibold">Teléfono:</span> {asistente.telefono}
             </p>
             <p>
-              <span className="text-white font-semibold">Placas del vehículo:</span> DXZ-679-B
+              <span className="text-white font-semibold">Placas del vehículo:</span> {asistente.placas}
             </p>
           </div>
         </div>

@@ -126,14 +126,19 @@ const ServiceForm = ({ serviceType }) => {
 
     if (typeof window !== "undefined" && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        ({ coords }) => router.push(`/asistente?lat=${coords.latitude}&lng=${coords.longitude}`),
+        ({ coords }) => {
+          router.push(`/asistente?lat=${coords.latitude}&lng=${coords.longitude}&tipo=${serviceType}`)
+        },
         (error) => {
           console.error("Ubicación error:", error)
           alert("No se pudo obtener tu ubicación.")
-          router.push("/asistente")
+          router.push(`/asistente?tipo=${serviceType}`)
         }
       )
-    } else router.push("/asistente")
+    } else {
+      router.push(`/asistente?tipo=${serviceType}`)
+    }
+    
   }
 
   const renderSelect = (name, label, options, required = false) => (
