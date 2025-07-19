@@ -22,20 +22,41 @@ const ServiceForm = ({ serviceType }) => {
 
   const marcas = ["Toyota", "Honda", "Ford", "Chevrolet", "Nissan", "Volkswagen", "Otro"]
   const metodosPago = ["Tarjeta", "Efectivo"]
-  const talleres = ["Taller Mecánico AutoAvante", "Garage Orona", "Multiservicios Almeraz"]
+  const [talleres, setTalleres] = useState([])
+  const [servicios, setServicios] = useState([])
   const tiposVehiculo = ["Sedán", "SUV", "Pickup", "Hatchback", "Minivan"]
   const serviciosGrua = ["Arrastre completo"]
   const serviciosLimpieza = ["Lavado exterior", "Lavado completo", "Detallado"]
 
-  const preciosServicios = {
-    asistencia: 183.3,
-    "Arrastre completo": 341.56,
-    "Lavado exterior": 120,
-    "Lavado completo": 250,
-    Detallado: 450,
-    diagnostico: 120,
-    cerrajeria: 430,
-  }
+  // Precios y multiplicadores se llenarán dinámicamente
+  const [preciosServicios, setPreciosServicios] = useState({})
+  // Cargar talleres y servicios desde la API
+  useEffect(() => {
+    const fetchTalleres = async () => {
+      try {
+        const res = await fetch("/api/talleres")
+        if (res.ok) {
+          const data = await res.json()
+          setTalleres(data)
+        }
+      } catch {}
+    }
+    const fetchServicios = async () => {
+      try {
+        const res = await fetch("/api/servicios")
+        if (res.ok) {
+          const data = await res.json()
+          setServicios(data)
+          // Precios por nombre
+          const precios = {}
+          data.forEach(s => { precios[s.nombre?.toLowerCase()] = s.precio })
+          setPreciosServicios(precios)
+        }
+      } catch {}
+    }
+    fetchTalleres()
+    fetchServicios()
+  }, [])
 
   const multiplicadoresTipoVehiculo = {
     "Sedán": 1,
@@ -45,6 +66,7 @@ const ServiceForm = ({ serviceType }) => {
     "Minivan": 1.25,
   }
 
+  // Encabezados y mapeo de tipos de servicio a nombre
   const encabezados = {
     asistencia: "Asistencia Vehicular",
     grua: "Servicio de Grúa",
@@ -53,10 +75,14 @@ const ServiceForm = ({ serviceType }) => {
     cerrajeria: "Servicio de Cerrajería"
   }
 
+  // Buscar si el tipo es uno de los fijos o un nombre de servicio registrado
+  const servicioDB = servicios.find(s => s.nombre?.toLowerCase() === (serviceType || '').toLowerCase());
+  const isTipoFijo = Object.keys(encabezados).includes(serviceType);
+
   const generarAnios = () => {
     const anios = []
     const anioActual = new Date().getFullYear()
-    for (let anio = anioActual; anio >= 1950; anio--) {
+    for (let anio = anioActual; anio >= 1990; anio--) {
       anios.push(anio)
     }
     return anios
@@ -83,23 +109,35 @@ const ServiceForm = ({ serviceType }) => {
     let total = 0
     setShowMultiplicadorNote(false)
 
+    // Buscar el nombre del servicio correspondiente al tipo
+    const nombreServicio = (tipo) => {
+      switch (tipo) {
+        case "asistencia": return "asistencia";
+        case "grua": return "grua";
+        case "limpieza": return "limpieza";
+        case "diagnostico": return "diagnostico";
+        case "cerrajeria": return "cerrajeria";
+        default: return tipo;
+      }
+    };
+
     if (serviceType === "asistencia") {
-      total += preciosServicios.asistencia || 0
+      total += preciosServicios[nombreServicio("asistencia")] || 0
     }
     if (serviceType === "grua" && formData.servicioGrua) {
-      total += preciosServicios[formData.servicioGrua] || 0
+      total += preciosServicios[nombreServicio("grua")] || 0
     }
     if (serviceType === "limpieza" && formData.servicioLimpieza) {
-      const basePrice = preciosServicios[formData.servicioLimpieza] || 0
+      const basePrice = preciosServicios[nombreServicio("limpieza")] || 0
       const multiplicador = multiplicadoresTipoVehiculo[formData.tipoVehiculo] || 1
       total += basePrice * multiplicador
       if (multiplicador > 1) setShowMultiplicadorNote(true)
     }
     if (serviceType === "diagnostico") {
-      total += preciosServicios.diagnostico || 0
+      total += preciosServicios[nombreServicio("diagnostico")] || 0
     }
     if (serviceType === "cerrajeria") {
-      total += preciosServicios.cerrajeria || 0
+      total += preciosServicios[nombreServicio("cerrajeria")] || 0
     }
     setPrice(total)
   }
@@ -184,61 +222,79 @@ const ServiceForm = ({ serviceType }) => {
     </div>
   )
 
-  if (!encabezados[serviceType]) {
-    return <p className="text-white text-center mt-10">Servicio no válido o no disponible</p>
+  if (!isTipoFijo && !servicioDB) {
+    return <p className="text-white text-center mt-10">Servicio no válido o no disponible</p>;
   }
 
   return (
     <div className="bg-[#1a1a1a] min-h-screen text-white py-8 pb-20">
       <div className="bg-[#1E1E1E] rounded-lg p-6 max-w-md mx-auto shadow-md border border-[#333]">
         <form onSubmit={handleSubmit}>
-          <h2 className="text-white text-xl font-bold mb-6">{encabezados[serviceType]}</h2>
+          <h2 className="text-white text-xl font-bold mb-6">
+            {isTipoFijo ? encabezados[serviceType] : servicioDB?.nombre}
+          </h2>
 
-          {serviceType === "asistencia" && (
+          {isTipoFijo ? (
             <>
-              {renderSelect("marca", "Marca", marcas, true)}
-              {renderInput("modelo", "Modelo", "text", true)}
-              {renderSelect("año", "Año", aniosVehiculos, true)}
-              {renderSelect("metodoPago", "Método de Pago", metodosPago, true)}
-              {renderSelect("tallerServicio", "Taller del Servicio", talleres)}
-            </>
-          )}
-
-          {serviceType === "grua" && (
-            <>
-              {renderSelect("tipoVehiculo", "Tipo de Vehiculo", tiposVehiculo, true)}
-              {renderSelect("metodoPago", "Método de Pago", metodosPago, true)}
-              {renderSelect("servicioGrua", "Servicio de grúa", serviciosGrua, true)}
-            </>
-          )}
-
-          {serviceType === "limpieza" && (
-            <>
-              {renderSelect("tipoVehiculo", "Tipo de Vehículo", tiposVehiculo, true)}
-              {renderSelect("servicioLimpieza", "Tipo de limpieza", serviciosLimpieza, true)}
-              {formData.servicioLimpieza && (
-                <div className="mb-4 text-sm text-gray-300 bg-[#2a2a2a] p-3 rounded-lg">
-                  {formData.servicioLimpieza === "Lavado exterior" && <p>Incluye lavado de carrocería, cristales y llantas. No se limpia el interior.</p>}
-                  {formData.servicioLimpieza === "Lavado completo" && <p>Incluye lavado exterior e interior (alfombras, tablero, puertas y asientos).</p>}
-                  {formData.servicioLimpieza === "Detallado" && <p>Limpieza profunda interior y exterior. Incluye encerado, abrillantado y restauración de plásticos.</p>}
-                </div>
+              {serviceType === "asistencia" && (
+                <>
+                  {renderSelect("marca", "Marca", marcas, true)}
+                  {renderInput("modelo", "Modelo", "text", true)}
+                  {renderSelect("año", "Año", aniosVehiculos, true)}
+                  {renderSelect("metodoPago", "Método de Pago", metodosPago, true)}
+                  {renderSelect(
+                    "tallerServicio",
+                    "Taller del Servicio",
+                    talleres.map(t => t.nombre),
+                    false
+                  )}
+                </>
               )}
-              {renderSelect("metodoPago", "Método de Pago", metodosPago, true)}
+              {serviceType === "grua" && (
+                <>
+                  {renderSelect("tipoVehiculo", "Tipo de Vehiculo", tiposVehiculo, true)}
+                  {renderSelect("metodoPago", "Método de Pago", metodosPago, true)}
+                  {renderSelect("servicioGrua", "Servicio de grúa", serviciosGrua, true)}
+                </>
+              )}
+              {serviceType === "limpieza" && (
+                <>
+                  {renderSelect("tipoVehiculo", "Tipo de Vehículo", tiposVehiculo, true)}
+                  {renderSelect("servicioLimpieza", "Tipo de limpieza", serviciosLimpieza, true)}
+                  {formData.servicioLimpieza && (
+                    <div className="mb-4 text-sm text-gray-300 bg-[#2a2a2a] p-3 rounded-lg">
+                      {formData.servicioLimpieza === "Lavado exterior" && <p>Incluye lavado de carrocería, cristales y llantas. No se limpia el interior.</p>}
+                      {formData.servicioLimpieza === "Lavado completo" && <p>Incluye lavado exterior e interior (alfombras, tablero, puertas y asientos).</p>}
+                      {formData.servicioLimpieza === "Detallado" && <p>Limpieza profunda interior y exterior. Incluye encerado, abrillantado y restauración de plásticos.</p>}
+                    </div>
+                  )}
+                  {renderSelect("metodoPago", "Método de Pago", metodosPago, true)}
+                </>
+              )}
+              {serviceType === "diagnostico" && (
+                <>
+                  {renderSelect("marca", "Marca", marcas, true)}
+                  {renderSelect("año", "Año", aniosVehiculos, true)}
+                </>
+              )}
+              {serviceType === "cerrajeria" && (
+                <>
+                  {renderSelect("marca", "Marca", marcas, true)}
+                  {renderInput("modelo", "Modelo", "text", true)}
+                  {renderSelect("año", "Año", aniosVehiculos, true)}
+                  {renderSelect("metodoPago", "Método de Pago", metodosPago, true)}
+                </>
+              )}
             </>
-          )}
-
-          {serviceType === "diagnostico" && (
+          ) : (
+            // Formulario genérico para cualquier servicio registrado
             <>
-              {renderSelect("marca", "Marca", marcas, true)}
-              {renderSelect("año", "Año", aniosVehiculos, true)}
-            </>
-          )}
-
-          {serviceType === "cerrajeria" && (
-            <>
-              {renderSelect("marca", "Marca", marcas, true)}
-              {renderInput("modelo", "Modelo", "text", true)}
-              {renderSelect("año", "Año", aniosVehiculos, true)}
+              {servicioDB?.descripcion && (
+                <div className="mb-4 text-gray-300 text-sm">{servicioDB.descripcion}</div>
+              )}
+              {renderInput("nombreCliente", "Tu nombre", "text", true)}
+              {renderInput("telefono", "Teléfono de contacto", "tel", true)}
+              {renderInput("email", "Correo electrónico", "email", false)}
               {renderSelect("metodoPago", "Método de Pago", metodosPago, true)}
             </>
           )}
